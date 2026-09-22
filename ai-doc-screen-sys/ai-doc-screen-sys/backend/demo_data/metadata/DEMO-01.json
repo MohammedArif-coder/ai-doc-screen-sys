@@ -1,0 +1,11 @@
+{
+  "id": "DEMO-01",
+  "applicant": "JOHN DOE",
+  "passport_no": "A12345678",
+  "visa_no": "V987654321",
+  "visa_type": "TOURIST",
+  "anomaly": "original",
+  "description": "ORIGINAL / AUTHENTIC VISA",
+  "quality_hint": 100,
+  "expected_findings": []
+}

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DAKSH Passport Screening</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .header {
+            background: #152238;
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: #c8d2e3;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .upload-card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 12px;
+        }
+
+        button {
+            background: #1565c0;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d47a1;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .status {
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .manual {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .clear {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .section {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .field {
+            background: #f7f9fc;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .field strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #526174;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .match {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .mismatch,
+        .fail {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .partial {
+            color: #b58105;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>DAKSH Passport Screening</h1>
+    <p>AI-assisted identity and document screening</p>
+</div>
+
+<div class="container">
+
+    <div class="upload-card">
+
+        <h2>Upload Passport</h2>
+
+        <p>Select a passport image in JPG or PNG format.</p>
+
+        <input
+            type="file"
+            id="passportFile"
+            accept=".jpg,.jpeg,.png"
+        >
+
+        <br>
+
+        <button onclick="analyzePassport()">
+            Analyze Passport
+        </button>
+
+        <div id="loading">
+            Analyzing document... Please wait.
+        </div>
+
+        <div id="error" class="error"></div>
+
+    </div>
+
+    <div id="results">
+
+        <div id="status" class="status"></div>
+
+        <div class="section">
+
+            <h2>Extracted Passport Details</h2>
+
+            <div id="visualFields" class="grid"></div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>MRZ Information</h2>
+
+            <div class="field">
+                <strong>MRZ Line 1</strong>
+                <span id="mrzLine1"></span>
+            </div>
+
+            <br>
+
+            <div class="field">
+                <strong>MRZ Line 2</strong>
+                <span id="mrzLine2"></span>
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>MRZ Validation</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Status</th>
+                        <th>Expected</th>
+                        <th>Calculated</th>
+                    </tr>
+                </thead>
+
+                <tbody id="validationTable"></tbody>
+
+            </table>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Visual ↔ MRZ Consistency</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Status</th>
+                        <th>Visual</th>
+                        <th>MRZ</th>
+                    </tr>
+                </thead>
+
+                <tbody id="consistencyTable"></tbody>
+
+            </table>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Screening Summary</h2>
+
+            <div id="summary" class="grid"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function analyzePassport() {
+
+    const fileInput = document.getElementById("passportFile");
+    const file = fileInput.files[0];
+
+    const errorBox = document.getElementById("error");
+    const loading = document.getElementById("loading");
+    const results = document.getElementById("results");
+
+    errorBox.textContent = "";
+
+    if (!file) {
+        errorBox.textContent = "Please select a passport image.";
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    loading.style.display = "block";
+    results.style.display = "none";
+
+    try {
+
+        const response = await fetch(
+            "/api/passport/screen",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Screening failed."
+            );
+        }
+
+        displayResults(data);
+
+    } catch (error) {
+
+        errorBox.textContent = error.message;
+
+    } finally {
+
+        loading.style.display = "none";
+    }
+}
+
+
+function displayResults(data) {
+
+    const results = document.getElementById("results");
+
+    results.style.display = "block";
+
+    // Status
+    const status = document.getElementById("status");
+
+    status.textContent =
+        "Status: " +
+        data.status.replaceAll("_", " ").toUpperCase();
+
+    if (data.status === "manual_review") {
+        status.className = "status manual";
+    } else {
+        status.className = "status clear";
+    }
+
+
+    // Visual fields
+    const visualContainer =
+        document.getElementById("visualFields");
+
+    visualContainer.innerHTML = "";
+
+    for (const [key, value] of
+         Object.entries(data.visual_fields)) {
+
+        const field = document.createElement("div");
+
+        field.className = "field";
+
+        field.innerHTML = `
+            <strong>${formatName(key)}</strong>
+            <span>${value || "Not detected"}</span>
+        `;
+
+        visualContainer.appendChild(field);
+    }
+
+
+    // MRZ
+    document.getElementById("mrzLine1").textContent =
+        data.mrz ? data.mrz.line1 : "Not detected";
+
+    document.getElementById("mrzLine2").textContent =
+        data.mrz ? data.mrz.line2 : "Not detected";
+
+
+    // MRZ validation
+    const validationTable =
+        document.getElementById("validationTable");
+
+    validationTable.innerHTML = "";
+
+    for (const [field, check] of
+         Object.entries(data.mrz_validation.checks)) {
+
+        const row = document.createElement("tr");
+
+        const statusText =
+            check.valid ? "PASS" : "FAIL";
+
+        const statusClass =
+            check.valid ? "match" : "fail";
+
+        row.innerHTML = `
+            <td>${formatName(field)}</td>
+            <td class="${statusClass}">
+                ${statusText}
+            </td>
+            <td>${check.expected}</td>
+            <td>${check.calculated}</td>
+        `;
+
+        validationTable.appendChild(row);
+    }
+
+
+    // Consistency
+    const consistencyTable =
+        document.getElementById("consistencyTable");
+
+    consistencyTable.innerHTML = "";
+
+    for (const item of data.consistency) {
+
+        let className = "";
+
+        if (item.status === "MATCH") {
+            className = "match";
+        } else if (item.status === "MISMATCH") {
+            className = "mismatch";
+        } else if (item.status === "PARTIAL") {
+            className = "partial";
+        }
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${formatName(item.field)}</td>
+            <td class="${className}">
+                ${item.status}
+            </td>
+            <td>${item.visual || "-"}</td>
+            <td>${item.mrz || "-"}</td>
+        `;
+
+        consistencyTable.appendChild(row);
+    }
+
+
+    // Summary
+    const summary =
+        document.getElementById("summary");
+
+    summary.innerHTML = "";
+
+    const summaryItems = {
+        "MRZ Validation Failures":
+            data.summary.mrz_validation_failures,
+
+        "Field Mismatches":
+            data.summary.field_mismatches,
+
+        "Partial Matches":
+            data.summary.partial_matches
+    };
+
+    for (const [key, value] of
+         Object.entries(summaryItems)) {
+
+        const field = document.createElement("div");
+
+        field.className = "field";
+
+        field.innerHTML = `
+            <strong>${key}</strong>
+            <span>${value}</span>
+        `;
+
+        summary.appendChild(field);
+    }
+}
+
+
+function formatName(text) {
+
+    return text
+        .replaceAll("_", " ")
+        .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+</script>
+
+</body>
+</html>

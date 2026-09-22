@@ -1,0 +1,18 @@
+{
+  "id": "DEMO-02",
+  "applicant": "JANE DOE",
+  "passport_no": "A12345678",
+  "visa_no": "V987654321",
+  "visa_type": "BUSINESS",
+  "anomaly": "tampered",
+  "description": "TAMPERED VISA (Altered Expiry & Visa No)",
+  "quality_hint": 35,
+  "expected_findings": [
+    {
+      "type": "date_inconsistency",
+      "severity": "high",
+      "message": "Expiration date contains an altered mismatch tag.",
+      "location": "EXPIRY DATE field"
+    }
+  ]
+}

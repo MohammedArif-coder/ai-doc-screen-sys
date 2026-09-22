@@ -1,0 +1,24 @@
+{
+  "id": "DEMO-03",
+  "applicant": "FAKE APPLICANT",
+  "passport_no": "INVALID999",
+  "visa_no": "V000000000",
+  "visa_type": "UNVERIFIED",
+  "anomaly": "fully_faked",
+  "description": "FULLY FAKED VISA (Counterfeit MRZ & Invalid Data)",
+  "quality_hint": 10,
+  "expected_findings": [
+    {
+      "type": "counterfeit_mrz",
+      "severity": "high",
+      "message": "MRZ checksum validation failed; invalid passport number (INVALID999).",
+      "location": "MRZ Zone & Passport Field"
+    },
+    {
+      "type": "invalid_seal",
+      "severity": "high",
+      "message": "Official seal pattern fail; counterfeit stamp detected.",
+      "location": "Official Seal area"
+    }
+  ]
+}
