@@ -26,8 +26,24 @@ AADHAAR_MAPPINGS = (
     ("passport", "dob", "aadhaar", "qr.dob", "HIGH"),
     ("passport", "date_of_birth", "aadhaar", "printed.dob", "HIGH"),
     ("passport", "date_of_birth", "aadhaar", "qr.dob", "HIGH"),
-    ("passport", "gender", "aadhaar", "printed.gender", "MEDIUM"),
-    ("passport", "gender", "aadhaar", "qr.gender", "MEDIUM"),
+    ("passport", "sex", "aadhaar", "printed.gender", "MEDIUM"),
+    ("passport", "sex", "aadhaar", "qr.gender", "MEDIUM"),
+)
+
+DL_MAPPINGS = (
+    ("passport", "name", "driving_licence", "name", "MEDIUM"),
+    ("passport", "dob", "driving_licence", "dob", "HIGH"),
+    ("aadhaar", "printed.name", "driving_licence", "name", "MEDIUM"),
+    ("aadhaar", "printed.dob", "driving_licence", "dob", "HIGH"),
+)
+
+PAN_MAPPINGS = (
+    ("passport", "name", "pan", "name", "MEDIUM"),
+    ("passport", "dob", "pan", "dob", "HIGH"),
+    ("aadhaar", "printed.name", "pan", "name", "MEDIUM"),
+    ("aadhaar", "printed.dob", "pan", "dob", "HIGH"),
+    ("driving_licence", "name", "pan", "name", "MEDIUM"),
+    ("driving_licence", "dob", "pan", "dob", "HIGH"),
 )
 
 
@@ -203,7 +219,9 @@ def detect_contradictions(evidence: list[Evidence]) -> list[Contradiction]:
             )
         )
 
-    for module_a, field_a, module_b, field_b, severity in AADHAAR_MAPPINGS:
+    for module_a, field_a, module_b, field_b, severity in (
+        AADHAAR_MAPPINGS + DL_MAPPINGS + PAN_MAPPINGS
+    ):
         item_a = _select_evidence(evidence, module=module_a, field=field_a)
         item_b = _select_evidence(evidence, module=module_b, field=field_b)
         if item_a is None or item_b is None:

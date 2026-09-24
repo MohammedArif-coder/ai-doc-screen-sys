@@ -1,6 +1,7 @@
-"""FastAPI entry point for the DAKSH P6 screening pipeline."""
+"""FastAPI entry point for the DAKSH P6 API."""
 
 from pathlib import Path
+import logging
 import tempfile
 from typing import Any
 from uuid import uuid4
@@ -14,6 +15,7 @@ from app.services.decision_engine import make_decision
 from app.services.risk_aggregator import aggregate_risk
 
 
+logger = logging.getLogger(__name__)
 app = FastAPI(title="DAKSH P6 API")
 app.add_middleware(
     CORSMiddleware,
@@ -62,6 +64,8 @@ def _public_case_data(case: CaseServiceResult) -> dict[str, Any]:
                 case.passport_document,
                 case.visa_document,
                 case.aadhaar_document,
+                case.driving_licence_document,
+                case.pan_document,
             )
             if document is not None
         ],
@@ -91,56 +95,104 @@ def health() -> dict[str, str]:
     return {"status": "ok", "service": "DAKSH P6 API"}
 
 
+def _is_valid_upload(file_obj: Any) -> bool:
+    return file_obj is not None and getattr(file_obj, "filename", None) is not None and bool(str(file_obj.filename).strip())
+
+
 @app.post("/api/screen-case")
 async def screen_case(
     passport: UploadFile | None = File(None),
     visa: UploadFile | None = File(None),
     aadhaar: UploadFile | None = File(None),
+    driving_licence: UploadFile | None = File(None),
+    pan: UploadFile | None = File(None),
 ) -> JSONResponse:
     passport_path: str | None = None
     visa_path: str | None = None
     aadhaar_path: str | None = None
+    dl_path: str | None = None
+    pan_path: str | None = None
+
     try:
-        if passport is not None:
+        if _is_valid_upload(passport):
             passport_path = await _save_upload(
                 passport,
                 Path(passport.filename or "passport.jpg").suffix or ".jpg",
             )
-        if visa is not None:
+        if _is_valid_upload(visa):
             visa_path = await _save_upload(
                 visa,
                 Path(visa.filename or "visa.jpg").suffix or ".jpg",
             )
-        if aadhaar is not None:
+        if _is_valid_upload(aadhaar):
             aadhaar_path = await _save_upload(
                 aadhaar,
                 Path(aadhaar.filename or "aadhaar.jpg").suffix or ".jpg",
             )
+        if _is_valid_upload(driving_licence):
+            dl_path = await _save_upload(
+                driving_licence,
+                Path(driving_licence.filename or "driving_licence.jpg").suffix or ".jpg",
+            )
+        if _is_valid_upload(pan):
+            pan_path = await _save_upload(
+                pan,
+                Path(pan.filename or "pan.jpg").suffix or ".jpg",
+            )
 
-        if passport_path is None and visa_path is None and aadhaar_path is None:
+        if (
+            passport_path is None
+            and visa_path is None
+            and aadhaar_path is None
+            and dl_path is None
+            and pan_path is None
+        ):
             return JSONResponse(
                 status_code=422,
                 content={"error": "Upload at least one document to start screening."},
             )
 
-        case = run_case(
-            passport_path,
-            visa_path,
-            aadhaar_image_path=aadhaar_path,
-        )
-        if (
-            case.passport_result is None
-            and case.visa_result is None
-            and case.aadhaar_result is None
-        ):
+        kwargs: dict[str, Any] = {}
+        if aadhaar_path is not None:
+            kwargs["aadhaar_image_path"] = aadhaar_path
+        if dl_path is not None:
+            kwargs["driving_licence_image_path"] = dl_path
+        if pan_path is not None:
+            kwargs["pan_image_path"] = pan_path
+
+        case = run_case(passport_path, visa_path, **kwargs)
+
+        def _is_failed(res: Any) -> bool:
+            return res is None or (getattr(res, "error", None) is not None and not getattr(res, "evidence", None))
+
+        passport_failed = (passport_path is None) or _is_failed(case.passport_result)
+        visa_failed = (visa_path is None) or _is_failed(case.visa_result)
+        aadhaar_failed = (aadhaar_path is None) or _is_failed(case.aadhaar_result)
+        dl_failed = (dl_path is None) or _is_failed(case.driving_licence_result)
+        pan_failed = (pan_path is None) or _is_failed(case.pan_result)
+
+        if passport_failed and visa_failed and aadhaar_failed and dl_failed and pan_failed:
+            error_message = "All submitted document processing failed."
+            if (
+                passport_path is not None
+                and visa_path is not None
+                and aadhaar_path is None
+                and dl_path is None
+                and pan_path is None
+            ):
+                error_message = "Both Passport and Visa processing failed."
             return JSONResponse(
                 status_code=422,
                 content={
-                    "error": (
-                        "All submitted document processing failed."
-                    ),
+                    "error": error_message,
                     **_public_case_data(case),
                 },
+            )
+
+        if case.adapter_errors:
+            logger.warning(
+                "DAKSH adapter processing errors: %s",
+                "; ".join(case.adapter_errors),
             )
 
         assessment = aggregate_risk(case.evidence, case.contradictions)
@@ -150,12 +202,13 @@ async def screen_case(
         response.update(_public_case_data(case))
         return JSONResponse(status_code=200, content=response)
     except Exception:
+        logger.exception("DAKSH case processing failed")
         return JSONResponse(
             status_code=500,
             content={"error": "DAKSH case processing failed."},
         )
     finally:
-        for path in (passport_path, visa_path, aadhaar_path):
+        for path in (passport_path, visa_path, aadhaar_path, dl_path, pan_path):
             if path is not None:
                 try:
                     Path(path).unlink(missing_ok=True)

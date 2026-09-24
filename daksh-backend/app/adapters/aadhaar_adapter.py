@@ -144,6 +144,7 @@ def _add_mapping(
                 field=f"{prefix}.{key}",
                 value=value,
                 source=source,
+                quality=_quality(value) if (prefix.startswith("quality") or key in {"score", "quality"}) else None,
             )
 
 
