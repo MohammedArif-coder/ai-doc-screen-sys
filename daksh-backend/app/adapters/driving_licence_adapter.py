@@ -100,35 +100,66 @@ def adapt_driving_licence_response(
     if not isinstance(response, dict):
         raise ValueError("Driving Licence response must be a JSON object.")
 
+    # Task 2: Unwrap response["result"] if present
+    target = response.get("result") if isinstance(response.get("result"), dict) else response
+
     evidence: list[Evidence] = []
     unmapped_fields: list[str] = []
 
-    visual_fields = response.get("visual_fields") or response.get("fields")
+    visual_fields = (
+        target.get("fields")
+        or target.get("visual_fields")
+        or response.get("fields")
+        or response.get("visual_fields")
+    )
+
     if isinstance(visual_fields, dict):
-        for field_name in (
-            "dl_number",
-            "name",
-            "dob",
-            "issuing_authority",
-            "validity_date",
-            "address",
-        ):
-            val = visual_fields.get(field_name)
-            if val is not None:
+        field_mapping = {
+            "dl_number": ["dl_number", "licence_number", "license_number"],
+            "name": ["name"],
+            "dob": ["dob", "date_of_birth"],
+            "issuing_authority": ["issuing_authority", "rto", "authority"],
+            "validity_date": ["validity_date", "valid_until", "valid_upto", "expiry_date"],
+            "address": ["address"],
+            "issue_date": ["issue_date", "doi"],
+            "vehicle_class": ["vehicle_class", "cov"]
+        }
+
+        extracted_dl_number = None
+
+        for daksh_field, possible_keys in field_mapping.items():
+            val = None
+            val_conf = None
+
+            for k in possible_keys:
+                if k in visual_fields:
+                    raw_item = visual_fields[k]
+                    if isinstance(raw_item, dict):
+                        val = raw_item.get("value")
+                        val_conf = raw_item.get("confidence")
+                    else:
+                        val = raw_item
+                    if _has_meaningful_value(val):
+                        break
+
+            if _has_meaningful_value(val):
+                if daksh_field == "dl_number":
+                    extracted_dl_number = str(val)
+
                 item = _evidence_from_item(
-                    evidence_id=f"{document_id}:visual_fields:{field_name}",
+                    evidence_id=f"{document_id}:visual_fields:{daksh_field}",
                     document_id=document_id,
                     evidence_type=EvidenceType.OBSERVATION,
-                    field_name=field_name,
+                    field_name=daksh_field,
                     value=val,
+                    confidence=val_conf if isinstance(val_conf, (int, float)) else None,
                     source="driving_licence.visual_fields",
                 )
                 if item is not None:
                     evidence.append(item)
 
-        dl_num = visual_fields.get("dl_number")
-        if dl_num is not None:
-            dl_validation = validate_dl_number(str(dl_num))
+        if extracted_dl_number:
+            dl_validation = validate_dl_number(extracted_dl_number)
             if dl_validation is not None:
                 item = _evidence_from_item(
                     evidence_id=f"{document_id}:validation:dl_number_format",
@@ -147,9 +178,9 @@ def adapt_driving_licence_response(
                 if item is not None:
                     evidence.append(item)
 
-    quality = response.get("quality")
+    quality = target.get("quality") or target.get("ocr") or response.get("quality")
     if isinstance(quality, dict):
-        score = quality.get("score")
+        score = quality.get("score") or quality.get("average_confidence")
         if isinstance(score, (int, float)):
             q_float = float(score) if 0.0 <= float(score) <= 1.0 else float(score) / 100.0
             item = _evidence_from_item(
@@ -164,8 +195,8 @@ def adapt_driving_licence_response(
             if item is not None:
                 evidence.append(item)
 
-    status = response.get("status") or "completed"
-    processing_status = status if isinstance(status, str) else "completed"
+    status = target.get("module_status") or target.get("status") or response.get("status") or "completed"
+    processing_status = status.lower() if isinstance(status, str) else "completed"
 
     return DrivingLicenceAdapterResult(
         document=Document(
@@ -180,64 +211,13 @@ def adapt_driving_licence_response(
     )
 
 
-def _ocr_extract_dl(path: Path) -> dict[str, Any] | None:
-    try:
-        from paddleocr import PaddleOCR
-        ocr = PaddleOCR(
-            lang="en",
-            use_doc_orientation_classify=False,
-            use_doc_unwarping=False,
-            use_textline_orientation=False,
-            enable_mkldnn=False,
-        )
-        results = ocr.predict(str(path))
-        lines = []
-        for result in results:
-            data = getattr(result, "json", {}) or {}
-            res = data.get("res", {})
-            for text in res.get("rec_texts", []):
-                lines.append(str(text).strip())
-
-        if not lines:
-            return None
-
-        fields = {}
-        for i, line in enumerate(lines):
-            dl_match = re.search(r"[A-Z]{2}[0-9]{2}[0-9A-Z]{9,11}", line.replace(" ", "").upper())
-            if dl_match and "dl_number" not in fields:
-                fields["dl_number"] = dl_match.group(0)
-
-            if ("Name:" in line or line.upper() == "NAME") and i + 1 < len(lines):
-                next_val = lines[i + 1]
-                if not any(k in next_val for k in ["DOB", "PHOTO", "Address", "Authority"]):
-                    fields["name"] = next_val.replace(":", "").strip()
-
-            if "DOB" in line.upper():
-                date_match = re.search(r"\d{2}/\d{2}/\d{4}|\d{4}-\d{2}-\d{2}", line)
-                if date_match:
-                    fields["dob"] = date_match.group(0)
-                elif i + 1 < len(lines):
-                    next_date = re.search(r"\d{2}/\d{2}/\d{4}|\d{4}-\d{2}-\d{2}", lines[i + 1])
-                    if next_date:
-                        fields["dob"] = next_date.group(0)
-
-            if "RTO" in line.upper():
-                fields["issuing_authority"] = line.replace("Authority.", "").strip()
-
-        if fields:
-            return {"status": "completed", "visual_fields": fields, "quality": {"score": 90.0}}
-    except Exception:
-        pass
-    return None
-
-
 def screen_driving_licence_file(
     image_path: str | Path,
     *,
     timeout: float = 300.0,
     endpoint: str = DL_API_URL,
 ) -> DrivingLicenceAdapterResult:
-    """Submit a local image to Driving Licence screening service or run PaddleOCR."""
+    """Submit a local image to Driving Licence screening service."""
 
     path = Path(image_path)
     document_id = _document_id(path)
@@ -277,15 +257,13 @@ def screen_driving_licence_file(
             payload = response.json()
             if isinstance(payload, dict):
                 return adapt_driving_licence_response(payload, document_id=document_id)
-    except (requests.RequestException, ValueError):
-        pass
+        return DrivingLicenceAdapterResult(
+            document=fallback,
+            error=f"Driving Licence service returned HTTP {response.status_code}.",
+        )
+    except requests.RequestException as exc:
+        return DrivingLicenceAdapterResult(
+            document=fallback,
+            error=f"Driving Licence service unavailable: {exc}",
+        )
 
-    # Dynamic PaddleOCR extraction fallback for uploaded image files
-    ocr_payload = _ocr_extract_dl(path)
-    if ocr_payload is not None:
-        return adapt_driving_licence_response(ocr_payload, document_id=document_id)
-
-    return DrivingLicenceAdapterResult(
-        document=fallback,
-        error="Driving Licence service unavailable and OCR extraction failed.",
-    )

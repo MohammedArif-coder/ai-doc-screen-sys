@@ -1,0 +1,676 @@
+{
+  "schema_version": "1.0",
+  "case_id": "CASE-B388D2B5",
+  "document_type": "aadhaar",
+  "document_variant": "unknown",
+  "module": "P3_AADHAAR",
+  "module_version": "1.0.0",
+  "module_status": "COMPLETE",
+  "generated_at": "2026-09-24T19:57:05.394223+00:00",
+  "processing": {
+    "started_at": "2026-09-24T19:57:05.394223+00:00",
+    "completed_at": "2026-09-24T19:57:05.700379+00:00",
+    "duration_ms": 306,
+    "pipeline_stage": "COMPLETE",
+    "build_stage_label": "COMPLETE",
+    "stages": [
+      {
+        "name": "security",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "Magic check: PASS"
+      },
+      {
+        "name": "document_loader",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "Pages 1"
+      },
+      {
+        "name": "quality",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "GOOD"
+      },
+      {
+        "name": "ocr",
+        "status": "PARTIAL",
+        "duration_ms": 0,
+        "notes": "Text length 0, conf 0.00"
+      },
+      {
+        "name": "orientation",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "Rotation 0"
+      },
+      {
+        "name": "qr",
+        "status": "DONE",
+        "duration_ms": 33,
+        "notes": "QR_NOT_PRESENT"
+      },
+      {
+        "name": "document_identification",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "UNSUPPORTED_DOCUMENT"
+      },
+      {
+        "name": "field_extraction",
+        "status": "DONE",
+        "duration_ms": 2,
+        "notes": "Fields 0"
+      },
+      {
+        "name": "number_validation",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "NOT_CHECKED"
+      },
+      {
+        "name": "photo",
+        "status": "DONE",
+        "duration_ms": 194,
+        "notes": "DETECTED"
+      },
+      {
+        "name": "face",
+        "status": "DONE",
+        "duration_ms": 39,
+        "notes": "NOT_CHECKED"
+      },
+      {
+        "name": "qr_consistency",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "NOT_CHECKED"
+      },
+      {
+        "name": "metadata",
+        "status": "DONE",
+        "duration_ms": 12,
+        "notes": "analyzed"
+      },
+      {
+        "name": "forensics",
+        "status": "DONE",
+        "duration_ms": 21,
+        "notes": "SUSPICIOUS"
+      },
+      {
+        "name": "ekyc",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "NOT_PROVIDED"
+      },
+      {
+        "name": "crypto",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "NOT_CHECKED"
+      },
+      {
+        "name": "evidence",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "5 evidences"
+      },
+      {
+        "name": "scoring",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "Score 75"
+      },
+      {
+        "name": "explanation",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "REVIEW"
+      },
+      {
+        "name": "artifacts",
+        "status": "DONE",
+        "duration_ms": 0,
+        "notes": "0 artifacts"
+      },
+      {
+        "name": "audit",
+        "status": "DONE",
+        "duration_ms": 2,
+        "notes": "EVT-7C567983"
+      }
+    ],
+    "pending_components": [],
+    "optional_inputs": [
+      "reference_face",
+      "offline_ekyc"
+    ],
+    "notes": []
+  },
+  "capabilities": {
+    "document_identification": true,
+    "quality_analysis": true,
+    "orientation_analysis": true,
+    "security_checks": true,
+    "ocr": false,
+    "number_validation": true,
+    "qr": true,
+    "qr_signature": false,
+    "photo": true,
+    "face_reference": false,
+    "face_comparison": false,
+    "forensics": true,
+    "metadata": true,
+    "offline_ekyc": false
+  },
+  "document": {
+    "file_name": "01_AADHAAR_MATCH.jpg",
+    "file_type": "jpg",
+    "file_size_bytes": 25361,
+    "mime_type": "image/jpeg",
+    "page_count": 1,
+    "pages_analyzed": 1,
+    "sha256": "2c9858ecc9745b326fd5c7b102b64497604fd2e044a088756f5b6c5ae10fddac",
+    "load_duration_ms": 0,
+    "storage_mode": "HASH_ONLY"
+  },
+  "document_security": {
+    "file_size_check": "PASS",
+    "mime_check": "PASS",
+    "extension_check": "PASS",
+    "magic_byte_check": "PASS",
+    "filename_sanitized": true,
+    "path_traversal_check": "PASS",
+    "corrupted_check": "PASS",
+    "pdf_check": null,
+    "zip_check": null,
+    "notes": [
+      "Magic check: PASS"
+    ]
+  },
+  "document_identification": {
+    "result": "UNSUPPORTED_DOCUMENT",
+    "confidence": 0.7,
+    "confidence_basis": "HEURISTIC",
+    "variant": "unknown",
+    "signals": [],
+    "keywords_found": [],
+    "notes": "Keyword matches: 0, has_number: False, has_qr: False"
+  },
+  "page_analyses": [
+    {
+      "page_number": 1,
+      "width": 800,
+      "height": 500,
+      "dpi_estimate": null,
+      "text_layer_present": false,
+      "notes": null
+    }
+  ],
+  "quality": {
+    "overall_score": 95.0,
+    "overall_label": "GOOD",
+    "blur_score": 1550.82,
+    "blur_label": "SHARP",
+    "brightness": 214.46,
+    "contrast": 79.16,
+    "glare_detected": true,
+    "is_blurry": false,
+    "is_low_quality": false,
+    "notes": [
+      "Blur variance 1550.8",
+      "Glare True"
+    ]
+  },
+  "orientation": {
+    "applied_rotation": 0,
+    "detected_rotation": 0,
+    "candidate_scores": {
+      "0": 1.0
+    },
+    "confidence": 1.0,
+    "method": "HEURISTIC",
+    "ambiguous": false
+  },
+  "fields": {
+    "name": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "masked_value": null,
+      "confidence": 0.0,
+      "confidence_basis": "HEURISTIC",
+      "status": "NOT_FOUND",
+      "sources": [],
+      "bounding_box": null,
+      "page": 1,
+      "notes": "No name pattern found",
+      "consistency": null
+    },
+    "dob": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "masked_value": null,
+      "confidence": 0.0,
+      "confidence_basis": "HEURISTIC",
+      "status": "NOT_FOUND",
+      "sources": [],
+      "bounding_box": null,
+      "page": 1,
+      "notes": "No DOB pattern",
+      "consistency": null
+    },
+    "year_of_birth": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "masked_value": null,
+      "confidence": 0.0,
+      "confidence_basis": "OCR_ENGINE",
+      "status": "NOT_FOUND",
+      "sources": [],
+      "bounding_box": null,
+      "page": 1,
+      "notes": null,
+      "consistency": null
+    },
+    "gender": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "masked_value": null,
+      "confidence": 0.0,
+      "confidence_basis": "OCR_ENGINE",
+      "status": "NOT_FOUND",
+      "sources": [],
+      "bounding_box": null,
+      "page": 1,
+      "notes": null,
+      "consistency": null
+    },
+    "aadhaar_number": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "masked_value": null,
+      "confidence": 0.0,
+      "confidence_basis": "OCR_ENGINE",
+      "status": "NOT_FOUND",
+      "sources": [],
+      "bounding_box": null,
+      "page": 1,
+      "notes": "No Aadhaar pattern",
+      "consistency": null
+    },
+    "address": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "masked_value": null,
+      "confidence": 0.0,
+      "confidence_basis": "OCR_ENGINE",
+      "status": "NOT_FOUND",
+      "sources": [],
+      "bounding_box": null,
+      "page": 1,
+      "notes": "No address label",
+      "consistency": null
+    }
+  },
+  "number_validation": {
+    "raw_candidate": null,
+    "normalized": null,
+    "masked_value": null,
+    "is_masked": false,
+    "format_status": "NOT_CHECKED",
+    "checksum_status": "NOT_CHECKED",
+    "checksum_message": null,
+    "ocr_ambiguities_considered": false,
+    "notes": "No Aadhaar candidate found"
+  },
+  "qr": {
+    "status": "QR_NOT_PRESENT",
+    "decoded": false,
+    "data_raw": null,
+    "data_truncated": null,
+    "fields": {},
+    "bounding_box": null,
+    "page": null,
+    "decode_time_ms": 33,
+    "notes": "No QR code detected. Some Aadhaar variants may not contain a readable QR."
+  },
+  "qr_consistency": {
+    "checked": false,
+    "items": [],
+    "overall": "NOT_CHECKED",
+    "mismatches": 0
+  },
+  "photo": {
+    "status": "DETECTED",
+    "bounding_box": [
+      32,
+      70,
+      144,
+      170
+    ],
+    "page": 1,
+    "quality_score": 50.0,
+    "quality_label": "MEDIUM",
+    "has_crop": true,
+    "notes": "Photo region detected via layout heuristic (fallback)"
+  },
+  "biometric": {
+    "status": "NOT_CHECKED",
+    "has_reference": false,
+    "reference_face_found": false,
+    "document_face_found": false,
+    "similarity": null,
+    "distance": null,
+    "threshold": 0.6,
+    "model": "OpenCV-Haar+Histogram-v1",
+    "model_version": "1.0",
+    "metric": "cosine",
+    "quality": null,
+    "message": "No reference face provided. Face comparison not performed.",
+    "notes": "Provide a reference/current face image for comparison."
+  },
+  "forensics": {
+    "analyzed": true,
+    "signals": [
+      "Local sharpness variance elevated (std 3919.7 vs mean 1719.1)"
+    ],
+    "regions": [
+      {
+        "region_id": "FOR-002",
+        "reason": "Localized sharpness inconsistency - possible inserted region",
+        "severity": "MEDIUM",
+        "confidence": 0.65,
+        "confidence_basis": "HEURISTIC",
+        "method": "local_sharpness",
+        "bounding_box": [
+          224,
+          96,
+          448,
+          160
+        ],
+        "evidence_id": "E-AAD-F2",
+        "page": 1
+      }
+    ],
+    "ela_score": 0.2046,
+    "noise_score": 1857.6459850549697,
+    "sharpness_variance": 3919.6811285868794,
+    "recompression_detected": false,
+    "overall_label": "SUSPICIOUS",
+    "notes": "Local sharpness variance elevated (std 3919.7 vs mean 1719.1)"
+  },
+  "metadata": {
+    "exif": {},
+    "software_tags": [],
+    "creation_metadata": null,
+    "dimensions": "800x500",
+    "file_type": ".jpg",
+    "signals": [],
+    "editing_software_detected": false,
+    "notes": "No EXIF metadata present. This is common for screenshots and compressed images and is not by itself suspicious."
+  },
+  "offline_ekyc": {
+    "provided": false,
+    "status": "NOT_PROVIDED",
+    "fields": {},
+    "signature_status": "NOT_CHECKED"
+  },
+  "validation": [
+    {
+      "check": "number_format",
+      "status": "NOT_CHECKED",
+      "message": null
+    },
+    {
+      "check": "checksum",
+      "status": "NOT_CHECKED"
+    }
+  ],
+  "contradictions": [],
+  "evidence": [
+    {
+      "evidence_id": "E-AAD-001",
+      "source": "QR",
+      "category": "QR",
+      "finding": "No QR code detected in document.",
+      "severity": "INFO",
+      "confidence": 1.0,
+      "confidence_basis": "HEURISTIC",
+      "group": "QR",
+      "independent_source": true,
+      "region": null,
+      "artifact": null,
+      "data": {}
+    },
+    {
+      "evidence_id": "E-AAD-002",
+      "source": "PHOTO",
+      "category": "PHOTO",
+      "finding": "Document photograph detected (quality MEDIUM)",
+      "severity": "INFO",
+      "confidence": 0.5,
+      "confidence_basis": "HEURISTIC",
+      "group": "PHOTO",
+      "independent_source": true,
+      "region": null,
+      "artifact": null,
+      "data": {
+        "bbox": [
+          32,
+          70,
+          144,
+          170
+        ],
+        "quality": "MEDIUM"
+      }
+    },
+    {
+      "evidence_id": "E-AAD-F2",
+      "source": "FORENSICS",
+      "category": "IMAGE_MANIPULATION",
+      "finding": "Localized forensic anomaly detected: Localized sharpness inconsistency - possible inserted region (method local_sharpness)",
+      "severity": "MEDIUM",
+      "confidence": 0.65,
+      "confidence_basis": "HEURISTIC",
+      "group": "FORENSICS",
+      "independent_source": true,
+      "region": "[224, 96, 448, 160]",
+      "artifact": "FOR-002",
+      "data": {
+        "region_id": "FOR-002",
+        "reason": "Localized sharpness inconsistency - possible inserted region",
+        "severity": "MEDIUM",
+        "confidence": 0.65,
+        "confidence_basis": "HEURISTIC",
+        "method": "local_sharpness",
+        "bounding_box": [
+          224,
+          96,
+          448,
+          160
+        ],
+        "evidence_id": "E-AAD-F2",
+        "page": 1
+      }
+    },
+    {
+      "evidence_id": "E-AAD-003",
+      "source": "QUALITY",
+      "category": "IMAGE_QUALITY",
+      "finding": "Image quality assessed as GOOD (score 95.0)",
+      "severity": "INFO",
+      "confidence": 0.7,
+      "confidence_basis": "HEURISTIC",
+      "group": "QUALITY",
+      "independent_source": true,
+      "region": null,
+      "artifact": null,
+      "data": {
+        "overall_score": 95.0,
+        "overall_label": "GOOD",
+        "blur_score": 1550.82,
+        "blur_label": "SHARP",
+        "brightness": 214.46,
+        "contrast": 79.16,
+        "glare_detected": true,
+        "is_blurry": false,
+        "is_low_quality": false,
+        "notes": [
+          "Blur variance 1550.8",
+          "Glare True"
+        ]
+      }
+    },
+    {
+      "evidence_id": "E-AAD-004",
+      "source": "DOCUMENT_IDENTIFICATION",
+      "category": "DOCUMENT_TYPE",
+      "finding": "Document does not appear to be Aadhaar (insufficient signals).",
+      "severity": "HIGH",
+      "confidence": 0.7,
+      "confidence_basis": "HEURISTIC",
+      "group": "IDENTIFICATION",
+      "independent_source": true,
+      "region": null,
+      "artifact": null,
+      "data": {
+        "result": "UNSUPPORTED_DOCUMENT",
+        "confidence": 0.7,
+        "confidence_basis": "HEURISTIC",
+        "variant": "unknown",
+        "signals": [],
+        "keywords_found": [],
+        "notes": "Keyword matches: 0, has_number: False, has_qr: False"
+      }
+    }
+  ],
+  "evidence_relations": [
+    {
+      "relation_id": "R-AAD-001",
+      "type": "INDEPENDENT",
+      "evidence_ids": [
+        "E-AAD-001",
+        "E-AAD-F2"
+      ],
+      "description": "QR and forensic evidence are independent sources; agreement increases confidence."
+    }
+  ],
+  "scores": {
+    "integrity_score": 75,
+    "evidence_coverage": 55,
+    "coverage_sufficient": false,
+    "scoring_model_version": "1.0",
+    "breakdown": {
+      "DOCUMENT_QUALITY": {
+        "weight": 10,
+        "penalty": 0,
+        "status": "PASS"
+      },
+      "FIELD_VALIDATION": {
+        "weight": 15,
+        "penalty": 10,
+        "status": "MANY_MISSING"
+      },
+      "NUMBER_VALIDATION": {
+        "weight": 10,
+        "penalty": 0,
+        "status": "PASS"
+      },
+      "QR": {
+        "weight": 20,
+        "penalty": 0,
+        "status": "NOT_PROVIDED",
+        "note": "Optional, not penalized"
+      },
+      "BIOMETRIC": {
+        "weight": 20,
+        "penalty": 0,
+        "status": "NOT_CHECKED",
+        "note": "No reference provided, not penalized"
+      },
+      "FORENSICS": {
+        "weight": 15,
+        "penalty": 10,
+        "status": "SUSPICIOUS",
+        "regions": 1
+      },
+      "METADATA": {
+        "weight": 5,
+        "penalty": 0,
+        "status": "PASS"
+      },
+      "DOCUMENT_IDENTIFICATION": {
+        "weight": 5,
+        "penalty": 5,
+        "status": "UNSUPPORTED"
+      }
+    },
+    "capped_due_to_correlation": false,
+    "notes": "Low evidence coverage; score confidence limited. Screening status may be INCONCLUSIVE."
+  },
+  "screening": {
+    "status": "REVIEW",
+    "headline": "Review recommended \u2014 meaningful inconsistency or suspicious signal detected.",
+    "reasons": [
+      {
+        "text": "Document does not appear to be Aadhaar (insufficient signals).",
+        "evidence_ids": [
+          "E-AAD-004"
+        ]
+      },
+      {
+        "text": "Evidence coverage is 55%, some checks could not be performed.",
+        "evidence_ids": []
+      }
+    ],
+    "recommended_action": "Inspect highlighted fields and suspicious regions. Perform authorized secondary verification via UIDAI-approved service before making a decision.",
+    "next_steps": [
+      "Inspect the highlighted DOB/Name/Number fields and QR comparison table.",
+      "Review forensic annotated image and suspicious region crops.",
+      "Perform authorized secondary verification via UIDAI eKYC / QR verifier where permitted."
+    ],
+    "limitations": [
+      "Official UIDAI authentication was not performed.",
+      "This is an AI-assisted screening system, not an official verification service.",
+      "Results are based on available evidence quality; low coverage reduces certainty.",
+      "Evidence coverage was 55%; several checks were limited by image quality or missing data.",
+      "QR cryptographic signature verification was not configured in this environment (NOT_CONFIGURED)."
+    ],
+    "evidence_ids": [
+      "E-AAD-004"
+    ]
+  },
+  "artifacts": {
+    "original_hash": "2c9858ecc9745b326fd5c7b102b64497604fd2e044a088756f5b6c5ae10fddac",
+    "items": [],
+    "report_available": false
+  },
+  "audit": {
+    "case_id": "CASE-B388D2B5",
+    "document_hash": "2c9858ecc9745b326fd5c7b102b64497604fd2e044a088756f5b6c5ae10fddac",
+    "manifest_hash": "6aded16d7fda9584ced3a74594b555ed233a1a4e9aed2ebef5a39bc08b07f144",
+    "report_hash": null,
+    "chain_event_id": "EVT-7C567983",
+    "chain_event_hash": "74afd3fbd8684b3953422e9f594b2faf973ef150e90efe3d75fc06dba04b3019",
+    "previous_hash": "GENESIS",
+    "chain_verified": true,
+    "blockchain_status": "NOT_CONFIGURED",
+    "blockchain_tx": null,
+    "timestamp": "2026-09-24T19:57:05.394223+00:00",
+    "notes": "Local tamper-evident hash chain. Blockchain anchoring not configured."
+  },
+  "privacy": {
+    "masked_aadhaar": null,
+    "pii_stored": false,
+    "storage_mode": "HASH_ONLY",
+    "retention_note": "Raw document not persisted by default (HASH_ONLY). Artifacts only when explicitly requested."
+  },
+  "errors": []
+}

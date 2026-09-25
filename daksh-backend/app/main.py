@@ -95,6 +95,36 @@ def health() -> dict[str, str]:
     return {"status": "ok", "service": "DAKSH P6 API"}
 
 
+@app.get("/api/system-status")
+def system_status() -> dict[str, Any]:
+    import requests
+
+    services = {
+        "aadhaar": {"port": 8001, "name": "Aadhaar Module", "status": "online"},
+        "pan": {"port": 8005, "name": "PAN Module", "status": "online"},
+        "dl": {"port": 8004, "name": "Driving Licence Module", "status": "online"},
+        "passport": {"port": 8002, "name": "Passport Module", "status": "online"},
+        "visa": {"port": 5000, "name": "Visa Module", "status": "online"},
+    }
+
+    for key, info in services.items():
+        port = info["port"]
+        try:
+            r = requests.get(f"http://127.0.0.1:{port}/api/health", timeout=0.5)
+            if r.ok:
+                info["status"] = "online"
+            else:
+                info["status"] = "degraded"
+        except Exception:
+            info["status"] = "offline"
+
+    return {
+        "daksh_engine": "online",
+        "api_mode": "real",
+        "services": services,
+    }
+
+
 def _is_valid_upload(file_obj: Any) -> bool:
     return file_obj is not None and getattr(file_obj, "filename", None) is not None and bool(str(file_obj.filename).strip())
 

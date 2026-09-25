@@ -287,15 +287,13 @@ def screen_pan_file(
             payload = response.json()
             if isinstance(payload, dict):
                 return adapt_pan_response(payload, document_id=document_id)
-    except (requests.RequestException, ValueError):
-        pass
+        return PANAdapterResult(
+            document=fallback,
+            error=f"PAN service returned HTTP {response.status_code}.",
+        )
+    except requests.RequestException as exc:
+        return PANAdapterResult(
+            document=fallback,
+            error=f"PAN service unavailable: {exc}",
+        )
 
-    # Dynamic PaddleOCR extraction fallback for uploaded image files
-    ocr_payload = _ocr_extract_pan(path)
-    if ocr_payload is not None:
-        return adapt_pan_response(ocr_payload, document_id=document_id)
-
-    return PANAdapterResult(
-        document=fallback,
-        error="PAN service unavailable and OCR extraction failed.",
-    )

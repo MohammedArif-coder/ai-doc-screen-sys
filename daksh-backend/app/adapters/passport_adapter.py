@@ -385,20 +385,23 @@ def screen_passport_file(
             payload = response.json()
             if isinstance(payload, dict):
                 return adapt_passport_response(payload, document_id=document_id)
-    except (requests.RequestException, ValueError):
-        pass
+        return PassportAdapterResult(
+            document=Document(
+                document_id=document_id,
+                document_type="Passport",
+                source_module="passport",
+                processing_status="error",
+            ),
+            error=f"Passport service returned HTTP {response.status_code}.",
+        )
+    except requests.RequestException as exc:
+        return PassportAdapterResult(
+            document=Document(
+                document_id=document_id,
+                document_type="Passport",
+                source_module="passport",
+                processing_status="service_unavailable",
+            ),
+            error=f"Passport service unavailable: {exc}",
+        )
 
-    # Dynamic local PaddleOCR/MRZ fallback when service port is offline
-    ocr_payload = _ocr_extract_passport(path)
-    if ocr_payload is not None:
-        return adapt_passport_response(ocr_payload, document_id=document_id)
-
-    return PassportAdapterResult(
-        document=Document(
-            document_id=document_id,
-            document_type="Passport",
-            source_module="passport",
-            processing_status="service_unavailable",
-        ),
-        error="Passport service unavailable and local MRZ OCR extraction failed.",
-    )

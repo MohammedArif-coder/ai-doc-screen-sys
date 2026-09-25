@@ -1,0 +1,55 @@
+daksh-frontend directory
+Root: C:\Users\arifi\OneDrive\Desktop\SIH 2026\DAKSH\daksh-frontend
+
+[Directories and files]
+.env.example
+index.html
+package.json
+package-lock.json
+postcss.config.js
+README.md
+[src]
+  [{api,components,config,hooks,pages,layouts}]
+  [api]
+    dakshApi.js
+    moduleApi.js
+    multiDocumentApi.js
+  App.jsx
+  [components]
+    ContradictionCards.jsx
+    DemoCases.jsx
+    DocumentOverview.jsx
+    EvidenceDetailModal.jsx
+    EvidenceExplorer.jsx
+    Header.jsx
+    HistoryDrawer.jsx
+    LimitationsBox.jsx
+    Navbar.jsx
+    PipelineSteps.jsx
+    ProcessingPipeline.jsx
+    ResultHeader.jsx
+    Sidebar.jsx
+    StatusPill.jsx
+    SystemStatus.jsx
+    UploadZone.jsx
+    WhyThisResult.jsx
+  [config]
+    modules.js
+  [data]
+    demoData.js
+  index.css
+  main.jsx
+  [pages]
+    Dashboard.jsx
+    History.jsx
+    IndividualProcessing.jsx
+    IndividualResult.jsx
+    IndividualSelect.jsx
+    IndividualUpload.jsx
+    MultiNewCase.jsx
+    MultiProcessing.jsx
+    MultiResult.jsx
+    SystemStatus.jsx
+  styles.css
+tailwind.config.js
+vite.config.js

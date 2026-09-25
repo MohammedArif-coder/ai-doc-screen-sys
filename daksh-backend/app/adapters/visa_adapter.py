@@ -409,15 +409,17 @@ def screen_visa_file(
                 if analysis_response.ok:
                     payload = analysis_response.json()
                     return adapt_visa_response(payload, document_id=_document_id(path, payload))
-    except (requests.RequestException, ValueError):
-        pass
+                return VisaAdapterResult(
+                    document=fallback_document,
+                    error=f"Visa analysis endpoint returned HTTP {analysis_response.status_code}.",
+                )
+        return VisaAdapterResult(
+            document=fallback_document,
+            error=f"Visa upload endpoint returned HTTP {upload_response.status_code}.",
+        )
+    except requests.RequestException as exc:
+        return VisaAdapterResult(
+            document=fallback_document,
+            error=f"Visa service unavailable: {exc}",
+        )
 
-    # Dynamic local PaddleOCR fallback when service port is offline
-    ocr_payload = _ocr_extract_visa(path)
-    if ocr_payload is not None:
-        return adapt_visa_response(ocr_payload, document_id=path.name)
-
-    return VisaAdapterResult(
-        document=fallback_document,
-        error="Visa service unavailable and local OCR extraction failed.",
-    )
